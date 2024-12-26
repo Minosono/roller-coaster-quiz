@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roller Coaster Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .streak {
+            margin-top: 10px;
+            font-size: 16px;
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+    <h1>Roller Coaster Manufacturer Quiz</h1>
+    <div id="quiz-container">
+        <img id="coaster-image" src="" alt="Roller Coaster">
+        <div>
+            <input type="text" id="manufacturer-input" placeholder="Enter Manufacturer">
+        </div>
+        <button onclick="checkAnswer()">Check</button>
+        <div class="result" id="result"></div>
+        <div class="streak" id="streak">STREAK 🔥: 0</div>
+    </div>
+
+    <script>
+        // Define your custom data here
+        const rollerCoasters = [
+            { image: "coaster1.png", manufacturer: "Wiegand" },
+            { image: "coaster2.png", manufacturer: "Vekoma" },
+            { image: "coaster3.png", manufacturer: "Gerstlauer" },
+            { image: "coaster4.png", manufacturer: "Mack Rides" },
+            { image: "coaster5.png", manufacturer: "Arrow Dynamics" },
+            { image: "coaster6.png", manufacturer: "SBF Visa" },
+            { image: "coaster7.png", manufacturer: "B&M" },
+            { image: "coaster8.png", manufacturer: "Maurer Rides" },
+            { image: "coaster9.png", manufacturer: "Intamin" },
+            { image: "coaster10.png", manufacturer: "Vekoma" },
+            { image: "coaster11.png", manufacturer: "Reverchon" },
+            { image: "coaster12.png", manufacturer: "Sunkid" },
+            { image: "coaster13.png", manufacturer: "Vekoma" },
+            { image: "coaster14.png", manufacturer: "Zierer" },
+            { image: "coaster15.png", manufacturer: "Pax Company" },
+            { image: "coaster16.png", manufacturer: "Intamin" },
+            { image: "coaster17.png", manufacturer: "Giovanola" },
+            { image: "coaster18.png", manufacturer: "Zierer" },
+            { image: "coaster19.png", manufacturer: "Zierer" },
+            { image: "coaster20.png", manufacturer: "Arrow Dynamics" },
+            { image: "coaster21.png", manufacturer: "Vekoma" },
+            { image: "coaster22.png", manufacturer: "Mack Rides" },
+            { image: "coaster23.png", manufacturer: "Wisdom Rides" },
+            { image: "coaster24.png", manufacturer: "Mack Rides" },
+            { image: "coaster25.png", manufacturer: "Maurer Rides" },
+            { image: "coaster26.png", manufacturer: "Allan Herschell" },
+            { image: "coaster27.png", manufacturer: "Gerstlauer" },
+            { image: "coaster28.png", manufacturer: "Skyline Attractions" },
+            { image: "coaster29.png", manufacturer: "B&M" },
+            { image: "coaster30.png", manufacturer: "Vekoma" },
+            { image: "coaster31.png", manufacturer: "Pinfari" },
+            { image: "coaster32.png", manufacturer: "Schwarzkopf" },
+            { image: "coaster33.png", manufacturer: "RMC" },
+            { image: "coaster34.png", manufacturer: "Brandauer" },
+            { image: "coaster35.png", manufacturer: "Pax Company" },
+            { image: "coaster36.png", manufacturer: "Jinma Rides" },
+            { image: "coaster37.png", manufacturer: "Premier Rides" },
+            { image: "coaster38.png", manufacturer: "Maurer Rides" },
+            { image: "coaster39.png", manufacturer: "Intamin" },
+            { image: "coaster40.png", manufacturer: "Philadelphia Toboggan Coaster" }
+        ];
+
+        let currentCoaster;
+        let remainingCoasters = [...rollerCoasters];
+        let streakCount = 0;
+
+        function loadRandomCoaster() {
+            if (remainingCoasters.length === 0) {
+                remainingCoasters = [...rollerCoasters];
+            }
+            const randomIndex = Math.floor(Math.random() * remainingCoasters.length);
+            currentCoaster = remainingCoasters.splice(randomIndex, 1)[0];
+            document.getElementById('coaster-image').src = currentCoaster.image;
+            document.getElementById('manufacturer-input').value = '';
+            document.getElementById('result').textContent = '';
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('manufacturer-input').value.trim();
+            const resultDiv = document.getElementById('result');
+            const streakDiv = document.getElementById('streak');
+
+            if (userAnswer.toLowerCase() === currentCoaster.manufacturer.toLowerCase()) {
+                resultDiv.textContent = "Correct!";
+                resultDiv.style.color = "green";
+                streakCount++;
+            } else {
+                resultDiv.textContent = `Wrong! The correct answer was ${currentCoaster.manufacturer}.`;
+                resultDiv.style.color = "red";
+                streakCount = 0;
+            }
+
+            streakDiv.textContent = `STREAK 🔥: ${streakCount}`;
+            setTimeout(loadRandomCoaster, 5000); // Load a new coaster after 5 seconds
+        }
+
+        // Initialize the quiz on page load
+        window.onload = loadRandomCoaster;
+    </script>
+</body>
+</html>
