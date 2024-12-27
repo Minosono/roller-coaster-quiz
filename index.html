@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roller Coaster Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            width: 300px; /* Fixed width */
+            height: 200px; /* Fixed height */
+        }
+        input[type="text"], .options {
+            width: 60%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .streak {
+            margin-top: 10px;
+            font-size: 16px;
+            color: orange;
+        }
+        .manufacturer-list {
+            margin-top: 20px;
+            display: none;
+            font-size: 16px;
+            text-align: left;
+        }
+        .highest-streak {
+            margin-top: 10px;
+            font-size: 16px;
+            color: blue;
+        }
+        .mode-toggle {
+            margin-bottom: 20px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: rgb(175, 175, 175);
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .slider.round {
+            border-radius: 20px;
+        }
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            justify-content: center;
+        }
+        .details {
+            display: none;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .countdown {
+            margin-top: 10px;
+            font-size: 16px;
+            color: red;
+        }
+        .autoplay-toggle {
+            margin-top: 20px;
+        }
+        .next-button {
+            display: none;
+            margin-top: 20px;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .dark-mode button, .dark-mode input[type="text"], .dark-mode .options {
+            background-color: #333333;
+            color: #ffffff;
+            border: 1px solid #555555;
+        }
+        .dark-mode .slider {
+            background-color: #555555;
+        }
+        .dark-mode .slider:before {
+            background-color: #ffffff;
+        }
+        .dark-mode .switch input:checked + .slider {
+            background-color: #2196F3;
+        }
+        .dark-mode .switch input:checked + .slider:before {
+            background-color: #ffffff;
+        }
+        .dark-mode .result {
+            color: #ffcc00;
+        }
+        .dark-mode .streak, .dark-mode .highest-streak, .dark-mode .countdown {
+            color: #ffcc00;
+        }
+        .dark-mode-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Roller Coaster Manufacturer Quiz</h1>
+    <div class="mode-toggle">
+        <div>SWITCH DIFFICULTY</div>
+        <div>\/</div>
+        <label class="switch">
+            <input type="checkbox" id="mode-switch" onchange="toggleMode()">
+            <span class="slider round"></span>
+        </label>
+        <span id="mode-label">HARD MODE</span>
+    </div>
+    <div class="autoplay-toggle">
+        <label class="switch">
+            <input type="checkbox" id="autoplay-switch" onchange="toggleAutoplay()">
+            <span class="slider round"></span>
+        </label>
+        <span>Autoplay</span>
+    </div>
+    <div class="dark-mode-toggle">
+        <label class="switch">
+            <input type="checkbox" id="dark-mode-switch" onchange="toggleDarkMode()">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <div class="countdown" id="countdown"></div>
+    <div id="quiz-container">
+        <img id="coaster-image" src="" alt="Roller Coaster">
+        <div id="input-container">
+            <input type="text" id="manufacturer-input" placeholder="Enter Manufacturer">
+            <button onclick="checkAnswer()">Check</button>
+        </div>
+        <div id="options-container" class="options-container" style="display: none;"></div>
+        <div class="result" id="result"></div>
+        <button id="next-button" class="next-button" onclick="loadRandomCoaster()">NEXT</button>
+        <div class="details" id="details" style="text-align: center;">
+            <ul style="display: inline-block; text-align: left;">
+                <li>Name: <span id="coaster-name"></span></li>
+                <li>Country: <span id="coaster-country"></span></li>
+                <li>Park: <span id="coaster-park"></span></li>
+                <li>Opening Date: <span id="coaster-opening-date"></span></li>
+            </ul>
+        </div>
+        <div class="streak" id="streak">STREAK 🔥: 0</div>
+        <div class="highest-streak" id="highest-streak">HIGHEST STREAK🔝: 0</div>
+    </div>
+    <button onclick="toggleManufacturerList()">CHEAT = LIST OF MANUFACTURER</button>
+    <button onclick="toggleDetails()">SHOW DETAILS</button>
+    <div class="manufacturer-list" id="manufacturer-list"></div>
+
+
+    <script>
+        // Define your custom data here
+        const rollerCoasters = [
+            { image: "coaster1.png", manufacturer: "Wiegand", name: "Silbersee Bob", country: "Germany", park: "---", openingDate: "2000" },
+            { image: "coaster2.png", manufacturer: "Vekoma", name: "悬挂式过山车", country: "China", park: "Suzhou Amusement Land", openingDate: "2003" },
+            { image: "coaster3.png", manufacturer: "Gerstlauer", name: "Pitts Special", country: "Finland", park: "PowerPark", openingDate: "2020" },
+            { image: "coaster4.png", manufacturer: "Mack Rides", name: "Gobbi Express", country: "Germany", park: "Taunus Wunderland", openingDate: "2024" },
+            { image: "coaster5.png", manufacturer: "Arrow Dynamics", name: "Roller Coaster", country: "India", park: "MGM Dizzee World", openingDate: "1996" },
+            { image: "coaster6.png", manufacturer: "SBF Visa", name: "Bandidos", country: "France", park: "Mer de Sable", openingDate: "2016" },
+            { image: "coaster7.png", manufacturer: "B&M", name: "Banshee", country: "USA", park: "Kings Island", openingDate: "2014" },
+            { image: "coaster8.png", manufacturer: "Maurer Rides", name: "Freischütz", country: "Germany", park: "Bayern-Park", openingDate: "2011" },
+            { image: "coaster9.png", manufacturer: "Intamin", name: "Ipanema Skate Ride", country: "Vietnam", park: "VinWonders", openingDate: "2020" },
+            { image: "coaster10.png", manufacturer: "Vekoma", name: "Boomerang", country: "Denmark", park: "Tivoli Karolinelund", openingDate: "1985" },
+            { image: "coaster11.png", manufacturer: "Reverchon", name: "Crazy Mouse", country: "Great Britain", park: "Funland Theme Park", openingDate: "2002" },
+            { image: "coaster12.png", manufacturer: "Sunkid", name: "Butterfly", country: "Germany", park: "Wildpark Schwarze Berge", openingDate: "2010" },
+            { image: "coaster13.png", manufacturer: "Vekoma", name: "High Speed Round Trip", country: "Vietnam", park: "Bao Son Paradise Park", openingDate: "2019" },
+            { image: "coaster14.png", manufacturer: "Zierer", name: "Force One Coaster", country: "Indonesia", park: "Kid City", openingDate: "2014" },
+            { image: "coaster15.png", manufacturer: "Pax Company", name: "Formula", country: "Russia", park: "VVC Wheel Park", openingDate: "2011" },
+            { image: "coaster16.png", manufacturer: "Intamin", name: "The Big One", country: "England", park: "Blackpool Pleasure Beach", openingDate: "1994" },
+            { image: "coaster17.png", manufacturer: "Giovanola", name: "Anaconda", country: "South Africa", park: "Gold Reef City", openingDate: "1999" },
+            { image: "coaster18.png", manufacturer: "Zierer", name: "Children Coaster", country: "Japan", park: "Nagashima Spa Land", openingDate: "1983" },
+            { image: "coaster19.png", manufacturer: "Zierer", name: "Vilde Hønsejagt", country: "Denmark", park: "Djurs Sommerland", openingDate: "2015" },
+            { image: "coaster20.png", manufacturer: "Arrow Dynamics", name: "Diamond Back", country: "USA", park: "Frontier City", openingDate: "1994" },
+            { image: "coaster21.png", manufacturer: "Vekoma", name: "Megaplitz", country: "Österreich", park: "Wiener Prater", openingDate: "1994" },
+            { image: "coaster22.png", manufacturer: "Mack Rides", name: "Hyper Coaster", country: "Turkey", park: "Land of Legends", openingDate: "2018" },
+            { image: "coaster23.png", manufacturer: "Wisdom Rides", name: "Miner Mike", country: "USA", park: "Haunted Trails", openingDate: "1994" },
+            { image: "coaster24.png", manufacturer: "Mack Rides", name: "Wild Mouse", country: "Japan", park: "Nagashima Spa Land", openingDate: "1996" },
+            { image: "coaster25.png", manufacturer: "Maurer Rides", name: "X-Coaster", country: "USA", park: "Magic Springs Theme and Water Park", openingDate: "2006" },
+            { image: "coaster26.png", manufacturer: "Allan Herschell", name: "Little Dipper", country: "USA", park: "Family Funland", openingDate: "2001" },
+            { image: "coaster27.png", manufacturer: "Gerstlauer", name: "Gipfelstürmer", country: "Germany", park: "Freizeitpark Ruhpolding", openingDate: "2011" },
+            { image: "coaster28.png", manufacturer: "Skyline Attractions", name: "Kid Flash Cosmic Coaster", country: "USA", park: "Six Flags Fiesta Texas", openingDate: "2024" },
+            { image: "coaster29.png", manufacturer: "B&M", name: "X-Flight", country: "USA", park: "Six Flags Great America", openingDate: "2012" },
+            { image: "coaster30.png", manufacturer: "Vekoma", name: "Mine Adventures", country: "Vietnam", park: "VinWonders", openingDate: "2016" },
+            { image: "coaster31.png", manufacturer: "Pinfari", name: "Gotham", country: "France", park: "Parc d'Attractions Marseillan-Plage", openingDate: "2021" },
+            { image: "coaster32.png", manufacturer: "Schwarzkopf", name: "Jet Scream", country: "USA", park: "Six Flags St. Louis", openingDate: "1981" },
+            { image: "coaster33.png", manufacturer: "RMC", name: "ArieForce One", country: "USA", park: "Fun Spot America Atlanta", openingDate: "2023" },
+            { image: "coaster34.png", manufacturer: "Brandauer", name: "Erlebnis-Rodelbahn Ruhla", country: "Germany", park: "Erlebnis-Arena-Ruhla", openingDate: "2008" },
+            { image: "coaster35.png", manufacturer: "Pax Company", name: "Cobra", country: "Switzerland", park: "Conny-Land", openingDate: "2010" },
+            { image: "coaster36.png", manufacturer: "Jinma Rides", name: "Moto Coaster / 摩托过山车", country: "China", park: "Foreigner Street", openingDate: "2012" },
+            { image: "coaster37.png", manufacturer: "Premier Rides", name: "Electric Eel", country: "USA", park: "SeaWorld San Diego", openingDate: "2018" },
+            { image: "coaster38.png", manufacturer: "Maurer Rides", name: "Shock", country: "Italy", park: "MagicLand", openingDate: "2011" },
+            { image: "coaster39.png", manufacturer: "Intamin", name: "Wave", country: "Great Britain", park: "Drayton Manor", openingDate: "1994" },
+            { image: "coaster40.png", manufacturer: "Philadelphia Toboggan Coaster", name: "Blue Streak", country: "USA", park: "Cedar Point", openingDate: "1964" }
+
+        ];
+
+        let currentCoaster;
+        let remainingCoasters = [...rollerCoasters];
+        let streakCount = 0;
+        let highestStreak = 0;
+        let answered = false;
+        let isHardMode = true;
+        let countdownInterval;
+        let isAutoplay = false;
+
+        function loadRandomCoaster() {
+            if (remainingCoasters.length === 0) {
+                remainingCoasters = [...rollerCoasters];
+            }
+            const randomIndex = Math.floor(Math.random() * remainingCoasters.length);
+            currentCoaster = remainingCoasters.splice(randomIndex, 1)[0];
+            document.getElementById('coaster-image').src = currentCoaster.image;
+            document.getElementById('manufacturer-input').value = '';
+            document.getElementById('result').textContent = '';
+            document.getElementById('details').style.display = 'none';
+            document.getElementById('countdown').textContent = '';
+            answered = false;
+            document.getElementById('next-button').style.display = 'none';
+
+            if (!isHardMode) {
+                loadOptions();
+            }
+
+            updateDetails();
+        }
+
+        function loadOptions() {
+            const optionsContainer = document.getElementById('options-container');
+            const uniqueManufacturers = [...new Set(rollerCoasters.map(coaster => coaster.manufacturer))];
+            const options = [currentCoaster.manufacturer];
+
+            while (options.length < 4) {
+                const randomManufacturer = uniqueManufacturers[Math.floor(Math.random() * uniqueManufacturers.length)];
+                if (!options.includes(randomManufacturer)) {
+                    options.push(randomManufacturer);
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5); // Shuffle options
+            optionsContainer.innerHTML = options.map(option => `<button onclick="selectOption('${option}')">${option}</button>`).join(' ');
+        }
+
+        function selectOption(option) {
+            document.getElementById('manufacturer-input').value = option;
+            checkAnswer();
+        }
+
+        function checkAnswer() {
+            if (answered) return;
+
+            const userAnswer = document.getElementById('manufacturer-input').value.trim();
+            const resultDiv = document.getElementById('result');
+            const streakDiv = document.getElementById('streak');
+            const highestStreakDiv = document.getElementById('highest-streak');
+
+            if (userAnswer.toLowerCase() === currentCoaster.manufacturer.toLowerCase()) {
+                resultDiv.textContent = "Correct!";
+                resultDiv.style.color = "green";
+                streakCount++;
+                if (streakCount > highestStreak) {
+                    highestStreak = streakCount;
+                    highestStreakDiv.textContent = `HIGHEST STREAK🔝: ${highestStreak}`;
+                }
+            } else {
+                resultDiv.textContent = `Wrong! The correct answer was ${currentCoaster.manufacturer}.`;
+                resultDiv.style.color = "red";
+                streakCount = 0;
+            }
+
+            streakDiv.textContent = `STREAK 🔥: ${streakCount}`;
+            answered = true;
+            showDetails();
+            if (isAutoplay) {
+                startCountdown(7); // 7 seconds countdown
+            } else {
+                document.getElementById('next-button').style.display = 'block';
+            }
+        }
+
+        function showDetails() {
+            document.getElementById('coaster-name').textContent = currentCoaster.name;
+            document.getElementById('coaster-country').textContent = currentCoaster.country;
+            document.getElementById('coaster-park').textContent = currentCoaster.park;
+            document.getElementById('coaster-opening-date').textContent = currentCoaster.openingDate;
+            document.getElementById('details').style.display = 'block';
+        }
+
+        function updateDetails() {
+            document.getElementById('coaster-name').textContent = currentCoaster.name;
+            document.getElementById('coaster-country').textContent = currentCoaster.country;
+            document.getElementById('coaster-park').textContent = currentCoaster.park;
+            document.getElementById('coaster-opening-date').textContent = currentCoaster.openingDate;
+        }
+
+        function startCountdown(seconds) {
+            let remainingTime = seconds;
+            document.getElementById('countdown').textContent = `Next image in ${remainingTime} seconds`;
+            countdownInterval = setInterval(() => {
+                remainingTime--;
+                document.getElementById('countdown').textContent = `Next image in ${remainingTime} seconds`;
+                if (remainingTime <= 0) {
+                    clearInterval(countdownInterval);
+                    loadRandomCoaster();
+                }
+            }, 1000);
+        }
+
+        function toggleManufacturerList() {
+            const listDiv = document.getElementById('manufacturer-list');
+            if (listDiv.style.display === 'none' || listDiv.style.display === '') {
+                listDiv.style.display = 'block';
+                const uniqueManufacturers = [...new Set(rollerCoasters.map(coaster => coaster.manufacturer))];
+                listDiv.innerHTML = uniqueManufacturers.join('<br>');
+            } else {
+                listDiv.style.display = 'none';
+            }
+        }
+
+        function toggleDetails() {
+            const detailsDiv = document.getElementById('details');
+            detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleMode() {
+            isHardMode = !isHardMode;
+            document.getElementById('input-container').style.display = isHardMode ? 'block' : 'none';
+            document.getElementById('options-container').style.display = isHardMode ? 'none' : 'grid';
+            document.getElementById('mode-label').textContent = isHardMode ? 'HARD MODE' : 'EASY MODE';
+            loadRandomCoaster();
+        }
+
+        function toggleAutoplay() {
+            isAutoplay = !isAutoplay;
+            document.getElementById('next-button').style.display = isAutoplay ? 'none' : 'block';
+            if (isAutoplay && answered) {
+                startCountdown(7);
+            }
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // Initialize the quiz on page load
+        window.onload = loadRandomCoaster;
+    </script>
+</body>
+</html>
