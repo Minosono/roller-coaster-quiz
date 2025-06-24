@@ -5,6 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roller Coaster Quiz</title>
     <style>
+        /* --- UPDATE POPUP STYLES --- */
+        #update-overlay {
+            position: fixed; /* Sit on top of the page content */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Black background with opacity */
+            z-index: 2000; /* Make sure it's on top */
+            display: flex; /* Use flexbox for easy centering */
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        #update-popup {
+            background-color: #fefefe;
+            color: #333; /* Text color for light mode */
+            padding: 20px 30px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        #close-popup {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #close-popup:hover,
+        #close-popup:focus {
+            color: black;
+            text-decoration: none;
+        }
+        
+        #update-popup h2 {
+            margin-top: 0;
+            color: #465C69;
+        }
+
+        #update-popup ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 15px 0;
+            text-align: left;
+            display: inline-block;
+        }
+
+        #update-popup li {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .update-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 25px;
+            background-color: #1976D2;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .update-button:hover {
+            background-color: #1565C0;
+            transform: scale(1.05);
+        }
+        
+        /* Dark mode compatibility for the popup */
+        .dark-mode #update-popup {
+            background-color: #2c2c2c;
+            color: #ffffff;
+            border-color: #555555;
+        }
+
+        .dark-mode #update-popup h2 {
+            color: #98A886;
+        }
+        
+        .dark-mode #close-popup {
+            color: #ccc;
+        }
+        
+        .dark-mode #close-popup:hover {
+            color: #fff;
+        }
+
+        .dark-mode .update-button {
+            background-color: #98A886;
+            color: #121212;
+        }
+
+        .dark-mode .update-button:hover {
+            background-color: #728f52;
+        }
+
+        /* --- ORIGINAL STYLES --- */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -219,6 +333,22 @@
     </style>
 </head>
 <body>
+
+    <!-- Update Popup -->
+    <div id="update-overlay">
+        <div id="update-popup">
+            <span id="close-popup" onclick="closePopup()">×</span>
+            <h2>Update Available!</h2>
+            <p>This version is outdated. A newer version is available with:</p>
+            <ul>
+                <li>🏆 A Scoreboard</li>
+                <li>🎨 A New Design</li>
+                <li>🎢 More Coasters!</li>
+            </ul>
+            <a href="https://minosono.github.io/CoasterQuizChallenge/" target="_blank" class="update-button">Go to the New Version!</a>
+        </div>
+    </div>
+
     <h1>Roller Coaster Manufacturer Quiz</h1>
     <div class="mode-toggle">
         <div>SWITCH DIFFICULTY</div>
@@ -268,10 +398,15 @@
     <div class="manufacturer-list" id="manufacturer-list"></div>
     <!-- Add the disclaimer here -->
     <div class="disclaimer" style="margin-top: 20px; font-size: 14px; color: gray;">
-        <span style="font-size: 20px; vertical-align: middle;">&#9432;</span> All data used on this website comes from RCDB.com
+        <span style="font-size: 20px; vertical-align: middle;">ⓘ</span> All data used on this website comes from RCDB.com
     </div>
     <script>
-        // Define your custom data here
+        // --- NEW SCRIPT FOR POPUP ---
+        function closePopup() {
+            document.getElementById('update-overlay').style.display = 'none';
+        }
+
+        // --- ORIGINAL SCRIPT ---
         const rollerCoasters = [
             { image: "coaster1.png", manufacturer: ["Wiegand", "Wiegand Coasters"], name: "Silbersee Bob", country: "Germany", park: "---", openingDate: "2000" },
             { image: "coaster2.png", manufacturer: ["Vekoma", "Vekoma Rides"], name: "悬挂式过山车", country: "China", park: "Suzhou Amusement Land", openingDate: "2003" },
